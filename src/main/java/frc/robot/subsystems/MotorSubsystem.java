@@ -8,10 +8,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -20,8 +20,8 @@ public class MotorSubsystem extends SubsystemBase {
   private final TalonFXSimState motorSimState = new TalonFXSimState(motor);
   private final double gearRatio = 1.0;
   //in cm
-  private final double wheelRadius = 500.0;
-  private final DCMotorSim motorSim = new DCMotorSim(DCMotor.getKrakenX60(1), gearRatio, 0.01);
+  private final double wheelRadius = 5.0;
+  private final DCMotorSim motorSim = new DCMotorSim(DCMotor.getKrakenX60(1), gearRatio, 100);
 
   private DoublePublisher velo;
   private DoublePublisher posi;
@@ -32,37 +32,25 @@ public class MotorSubsystem extends SubsystemBase {
 
     velo = table.getDoubleTopic("Velocity").publish();
     posi = table.getDoubleTopic("Position").publish();
-
   }
 
-  public Command move(double voltage) {
-    return startEnd(
-      () -> {
-        motor.setVoltage(voltage);
-      },
+  public Command stop() {
+    return runOnce(
       () -> {
         motor.setVoltage(0.0);
-      });
+      }
+    );
   }
 
-  public Command moveLeft(double leftXAxis, double voltage) {
-    return startEnd(
+  public Command move(XboxController controller, double voltage) {
+    double axis = controller.getRawAxis(0);
+    final double motorVoltage = Math.floor((voltage / 1.0) * axis);
+    System.out.println(motorVoltage);
+    return run(
       () -> {
-        System.out.println(leftXAxis);
-      }, 
-      () -> {
-
-      });
-  }
-
-  public Command moveRight(double rightXAxis, double voltage) {
-    return startEnd(
-      () -> {
-        System.out.println(rightXAxis);
-      }, 
-      () -> {
-        
-      });
+        motor.setVoltage(motorVoltage);
+      }
+    );
   }
 
   public void initSendable() {

@@ -5,9 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.MotorSubsystem;
 
 public class Robot extends TimedRobot {
@@ -15,7 +15,7 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final XboxController driverController = new XboxController(0);
   private final MotorSubsystem motorSubsystem = new MotorSubsystem();
 
   @Override
@@ -54,8 +54,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    motorSubsystem.moveRight(driverController.getRightX(), 5.0);
-    motorSubsystem.moveLeft(driverController.getRawAxis(0), -5.0);
+    motorSubsystem.move(driverController, 5.0).execute();
   }
 
   @Override
